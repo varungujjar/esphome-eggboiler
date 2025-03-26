@@ -1,0 +1,72 @@
+esphome:
+  name: egg-boiler-esp12e
+  friendly_name: Egg Boiler ESP12E
+
+  on_boot:
+  # buzzeron on startup
+    priority: -100
+    then:
+      - switch.turn_on: relay
+      - rtttl.play: 'Original1:d=4,o=5,b=140:16e,16g,16a,16c'
+  
+output:
+  - platform: esp8266_pwm
+    pin: GPIO13
+    id: rtttl_out
+    max_power: 0.1
+    
+rtttl:
+  output: rtttl_out
+
+one_wire:
+  - platform: gpio
+    pin: GPIO14
+
+sensor:
+  - platform: dallas_temp
+    name: temperature
+    update_interval: 5s
+    on_value_range:
+      - above: 105
+        then:
+          - switch.turn_off: relay
+          - rtttl.play: "mario:d=4,o=5,b=100:16e6,16e6,32p,8e6,16c6,8e6,8g6,8p,8g,8p,8c6,16p,8g,16p,8e,16p,8a,8b,16a#,8a,16g.,16e6,16g6,8a6,16f6,8g6,8e6,16c6,16d6,8b,16p,8c6,16p,8g,16p,8e,16p,8a,8b,16a#,8a,16g.,16e6,16g6,8a6,16f6,8g6,8e6,16c6,16d6,8b,8p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16g#,16a,16c6,16p,16a,16c6,16d6,8p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16c7,16p,16c7,16c7,p,16g6,16f#6,16f6,16d#6,16p,16e6,16p,16g#,16a,16c6,16p,16a,16c6,16d6,8p,16d#6,8p,16d6,8p,16c6" 
+
+
+switch:
+  - platform: gpio
+    name: "Relay"
+    id: relay
+    pin: GPIO5
+    restore_mode: ALWAYS_ON  
+
+
+esp8266:
+  board: esp12e
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "nse0O8uDcISopqUJ8oE79e8rq94RapgXQ6KZBP2Xn1Q="
+
+ota:
+  - platform: esphome
+    password: "3548139cc45f90fa5c757f1d79db63cc"
+
+web_server:
+
+wifi:
+  ssid: <Your SSID>
+  password: <Your Password>
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Egg-Boiler Fallback Hotspot"
+    password: "HTYxo4F0HS9O"
+
+
+captive_portal:
